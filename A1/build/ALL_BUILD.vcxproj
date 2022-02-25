@@ -1,0 +1,196 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ResolveNugetPackages>false</ResolveNugetPackages>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{E871EF91-75B0-378B-B059-1FD589B16690}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>ALL_BUILD</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\source\libwb;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\source\libwb;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\source\libwb;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\source\libwb;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\source\CMakeLists.txt">
+      <StdOutEncoding>UTF-8</StdOutEncoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule D:/OneDrive/OneDrive - Asian Answers/Documentos/CSUS/CSC163/Assignments/A1/A1/source/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"D:\Program Files\CMake\bin\cmake.exe" "-SD:/OneDrive/OneDrive - Asian Answers/Documentos/CSUS/CSC163/Assignments/A1/A1/source" "-BD:/OneDrive/OneDrive - Asian Answers/Documentos/CSUS/CSC163/Assignments/A1/A1/build" --check-stamp-file "D:/OneDrive/OneDrive - Asian Answers/Documentos/CSUS/CSC163/Assignments/A1/A1/build/CMakeFiles/generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\3.23.0-rc1\CMakeCCompiler.cmake;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\3.23.0-rc1\CMakeCXXCompiler.cmake;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\3.23.0-rc1\CMakeRCCompiler.cmake;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\3.23.0-rc1\CMakeSystem.cmake;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\BasicMatrixMultiplication_Template.dir\BasicMatrixMultiplication\BasicMatrixMultiplication_Template_generated_template.cu.obj.cmake.pre-gen;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\BasicMatrixMultiplication_Template.dir\BasicMatrixMultiplication\BasicMatrixMultiplication_Template_generated_template.cu.obj.depend;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\TiledMatrixMultiplication_Template.dir\TiledMatrixMultiplication\TiledMatrixMultiplication_Template_generated_template.cu.obj.cmake.pre-gen;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\TiledMatrixMultiplication_Template.dir\TiledMatrixMultiplication\TiledMatrixMultiplication_Template_generated_template.cu.obj.depend;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\VectorAdd_Template.dir\VectorAdd\VectorAdd_Template_generated_template.cu.obj.cmake.pre-gen;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\VectorAdd_Template.dir\VectorAdd\VectorAdd_Template_generated_template.cu.obj.depend;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\source\BasicMatrixMultiplication\sources.cmake;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\source\TiledMatrixMultiplication\sources.cmake;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\source\VectorAdd\sources.cmake;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\source\libwb\sources.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeCInformation.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeCXXInformation.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeCommonLanguageInclude.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeGenericSystem.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeInitializeConfigs.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeLanguageInformation.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeRCInformation.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeSystemSpecificInformation.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeSystemSpecificInitialize.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Compiler\CMakeCommonCompilerMacros.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Compiler\MSVC-C.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Compiler\MSVC-CXX.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\FindCUDA.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\FindCUDA\run_nvcc.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\FindCUDA\select_compute_arch.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\FindPackageHandleStandardArgs.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\FindPackageMessage.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Platform\Windows-MSVC-C.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Platform\Windows-MSVC-CXX.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Platform\Windows-MSVC.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Platform\Windows.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Platform\WindowsPaths.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule D:/OneDrive/OneDrive - Asian Answers/Documentos/CSUS/CSC163/Assignments/A1/A1/source/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"D:\Program Files\CMake\bin\cmake.exe" "-SD:/OneDrive/OneDrive - Asian Answers/Documentos/CSUS/CSC163/Assignments/A1/A1/source" "-BD:/OneDrive/OneDrive - Asian Answers/Documentos/CSUS/CSC163/Assignments/A1/A1/build" --check-stamp-file "D:/OneDrive/OneDrive - Asian Answers/Documentos/CSUS/CSC163/Assignments/A1/A1/build/CMakeFiles/generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\3.23.0-rc1\CMakeCCompiler.cmake;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\3.23.0-rc1\CMakeCXXCompiler.cmake;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\3.23.0-rc1\CMakeRCCompiler.cmake;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\3.23.0-rc1\CMakeSystem.cmake;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\BasicMatrixMultiplication_Template.dir\BasicMatrixMultiplication\BasicMatrixMultiplication_Template_generated_template.cu.obj.cmake.pre-gen;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\BasicMatrixMultiplication_Template.dir\BasicMatrixMultiplication\BasicMatrixMultiplication_Template_generated_template.cu.obj.depend;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\TiledMatrixMultiplication_Template.dir\TiledMatrixMultiplication\TiledMatrixMultiplication_Template_generated_template.cu.obj.cmake.pre-gen;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\TiledMatrixMultiplication_Template.dir\TiledMatrixMultiplication\TiledMatrixMultiplication_Template_generated_template.cu.obj.depend;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\VectorAdd_Template.dir\VectorAdd\VectorAdd_Template_generated_template.cu.obj.cmake.pre-gen;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\VectorAdd_Template.dir\VectorAdd\VectorAdd_Template_generated_template.cu.obj.depend;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\source\BasicMatrixMultiplication\sources.cmake;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\source\TiledMatrixMultiplication\sources.cmake;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\source\VectorAdd\sources.cmake;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\source\libwb\sources.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeCInformation.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeCXXInformation.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeCommonLanguageInclude.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeGenericSystem.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeInitializeConfigs.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeLanguageInformation.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeRCInformation.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeSystemSpecificInformation.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeSystemSpecificInitialize.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Compiler\CMakeCommonCompilerMacros.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Compiler\MSVC-C.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Compiler\MSVC-CXX.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\FindCUDA.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\FindCUDA\run_nvcc.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\FindCUDA\select_compute_arch.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\FindPackageHandleStandardArgs.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\FindPackageMessage.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Platform\Windows-MSVC-C.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Platform\Windows-MSVC-CXX.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Platform\Windows-MSVC.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Platform\Windows.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Platform\WindowsPaths.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule D:/OneDrive/OneDrive - Asian Answers/Documentos/CSUS/CSC163/Assignments/A1/A1/source/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"D:\Program Files\CMake\bin\cmake.exe" "-SD:/OneDrive/OneDrive - Asian Answers/Documentos/CSUS/CSC163/Assignments/A1/A1/source" "-BD:/OneDrive/OneDrive - Asian Answers/Documentos/CSUS/CSC163/Assignments/A1/A1/build" --check-stamp-file "D:/OneDrive/OneDrive - Asian Answers/Documentos/CSUS/CSC163/Assignments/A1/A1/build/CMakeFiles/generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\3.23.0-rc1\CMakeCCompiler.cmake;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\3.23.0-rc1\CMakeCXXCompiler.cmake;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\3.23.0-rc1\CMakeRCCompiler.cmake;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\3.23.0-rc1\CMakeSystem.cmake;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\BasicMatrixMultiplication_Template.dir\BasicMatrixMultiplication\BasicMatrixMultiplication_Template_generated_template.cu.obj.cmake.pre-gen;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\BasicMatrixMultiplication_Template.dir\BasicMatrixMultiplication\BasicMatrixMultiplication_Template_generated_template.cu.obj.depend;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\TiledMatrixMultiplication_Template.dir\TiledMatrixMultiplication\TiledMatrixMultiplication_Template_generated_template.cu.obj.cmake.pre-gen;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\TiledMatrixMultiplication_Template.dir\TiledMatrixMultiplication\TiledMatrixMultiplication_Template_generated_template.cu.obj.depend;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\VectorAdd_Template.dir\VectorAdd\VectorAdd_Template_generated_template.cu.obj.cmake.pre-gen;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\VectorAdd_Template.dir\VectorAdd\VectorAdd_Template_generated_template.cu.obj.depend;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\source\BasicMatrixMultiplication\sources.cmake;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\source\TiledMatrixMultiplication\sources.cmake;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\source\VectorAdd\sources.cmake;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\source\libwb\sources.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeCInformation.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeCXXInformation.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeCommonLanguageInclude.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeGenericSystem.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeInitializeConfigs.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeLanguageInformation.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeRCInformation.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeSystemSpecificInformation.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeSystemSpecificInitialize.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Compiler\CMakeCommonCompilerMacros.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Compiler\MSVC-C.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Compiler\MSVC-CXX.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\FindCUDA.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\FindCUDA\run_nvcc.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\FindCUDA\select_compute_arch.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\FindPackageHandleStandardArgs.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\FindPackageMessage.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Platform\Windows-MSVC-C.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Platform\Windows-MSVC-CXX.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Platform\Windows-MSVC.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Platform\Windows.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Platform\WindowsPaths.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule D:/OneDrive/OneDrive - Asian Answers/Documentos/CSUS/CSC163/Assignments/A1/A1/source/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"D:\Program Files\CMake\bin\cmake.exe" "-SD:/OneDrive/OneDrive - Asian Answers/Documentos/CSUS/CSC163/Assignments/A1/A1/source" "-BD:/OneDrive/OneDrive - Asian Answers/Documentos/CSUS/CSC163/Assignments/A1/A1/build" --check-stamp-file "D:/OneDrive/OneDrive - Asian Answers/Documentos/CSUS/CSC163/Assignments/A1/A1/build/CMakeFiles/generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\3.23.0-rc1\CMakeCCompiler.cmake;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\3.23.0-rc1\CMakeCXXCompiler.cmake;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\3.23.0-rc1\CMakeRCCompiler.cmake;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\3.23.0-rc1\CMakeSystem.cmake;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\BasicMatrixMultiplication_Template.dir\BasicMatrixMultiplication\BasicMatrixMultiplication_Template_generated_template.cu.obj.cmake.pre-gen;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\BasicMatrixMultiplication_Template.dir\BasicMatrixMultiplication\BasicMatrixMultiplication_Template_generated_template.cu.obj.depend;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\TiledMatrixMultiplication_Template.dir\TiledMatrixMultiplication\TiledMatrixMultiplication_Template_generated_template.cu.obj.cmake.pre-gen;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\TiledMatrixMultiplication_Template.dir\TiledMatrixMultiplication\TiledMatrixMultiplication_Template_generated_template.cu.obj.depend;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\VectorAdd_Template.dir\VectorAdd\VectorAdd_Template_generated_template.cu.obj.cmake.pre-gen;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\VectorAdd_Template.dir\VectorAdd\VectorAdd_Template_generated_template.cu.obj.depend;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\source\BasicMatrixMultiplication\sources.cmake;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\source\TiledMatrixMultiplication\sources.cmake;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\source\VectorAdd\sources.cmake;D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\source\libwb\sources.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeCInformation.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeCXXInformation.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeCommonLanguageInclude.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeGenericSystem.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeInitializeConfigs.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeLanguageInformation.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeRCInformation.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeSystemSpecificInformation.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\CMakeSystemSpecificInitialize.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Compiler\CMakeCommonCompilerMacros.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Compiler\MSVC-C.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Compiler\MSVC-CXX.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\FindCUDA.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\FindCUDA\run_nvcc.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\FindCUDA\select_compute_arch.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\FindPackageHandleStandardArgs.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\FindPackageMessage.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Platform\Windows-MSVC-C.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Platform\Windows-MSVC-CXX.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Platform\Windows-MSVC.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Platform\Windows.cmake;D:\Program Files\CMake\share\cmake-3.23\Modules\Platform\WindowsPaths.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\ZERO_CHECK.vcxproj">
+      <Project>{B448C7C3-D715-39AA-BD8B-BC4D94D30573}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\BasicMatrixMultiplication_Template.vcxproj">
+      <Project>{A9ED83C6-E8C5-3446-8C89-CD81204DA718}</Project>
+      <Name>BasicMatrixMultiplication_Template</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\TiledMatrixMultiplication_Template.vcxproj">
+      <Project>{0BDA2F11-B6EA-396E-B31D-41F6C9AA1E6C}</Project>
+      <Name>TiledMatrixMultiplication_Template</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\VectorAdd_Template.vcxproj">
+      <Project>{B9ED78D0-ABB7-3398-9BF9-13E6F7BC41FF}</Project>
+      <Name>VectorAdd_Template</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\OneDrive\OneDrive - Asian Answers\Documentos\CSUS\CSC163\Assignments\A1\A1\build\wb.vcxproj">
+      <Project>{F203F2D5-FD9D-3885-BF1B-D64C05073537}</Project>
+      <Name>wb</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
