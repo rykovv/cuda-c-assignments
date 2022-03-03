@@ -25,10 +25,10 @@ __global__ void matrixMultiply(float *A, float *B, float *C, int numARows,
 
     if (Col < numBColumns && Row < numARows) {
         float tmpC = 0;
-        for (int k = 0; k < numBColumns; k++) {
-            tmpC += A[k*numARows+Row] + B[Col*numBColumns+k];
+        for (int k = 0; k < numAColumns; k++) {
+            tmpC += A[Row*numAColumns+k] * B[k*numBColumns+Col];
         }
-        C[Row*numAColumns+Col] = tmpC;
+        C[Row*numBColumns+Col] = tmpC;
     }
 }
 
@@ -57,8 +57,8 @@ int main(int argc, char **argv) {
   hostB = (float *)wbImport(wbArg_getInputFile(args, 1), &numBRows,
                             &numBColumns);
   //@@ Set numCRows and numCColumns
-  numCRows    = numBRows;
-  numCColumns = numAColumns;
+  numCRows    = numARows;
+  numCColumns = numBColumns;
   //@@ Allocate the hostC matrix
   hostC = (float *)malloc(numCRows * numCColumns * sizeof(float));
   wbTime_stop(Generic, "Importing data and creating memory on host");
@@ -80,7 +80,7 @@ int main(int argc, char **argv) {
   wbTime_stop(GPU, "Copying input memory to the GPU.");
 
   //@@ Initialize the grid and block dimensions here
-  dim3 DimGrid((numCRows - 1) / THREADS_PER_BLOCK + 1, (numCColumns - 1) / THREADS_PER_BLOCK + 1, 1);
+  dim3 DimGrid((numCColumns - 1) / THREADS_PER_BLOCK + 1, (numCRows - 1) / THREADS_PER_BLOCK + 1, 1);
   dim3 DimBlock(THREADS_PER_BLOCK, THREADS_PER_BLOCK, 1);
 
   wbTime_start(Compute, "Performing CUDA computation");
