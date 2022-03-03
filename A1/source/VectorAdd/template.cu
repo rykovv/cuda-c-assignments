@@ -11,7 +11,6 @@ __global__ void vecAdd(float *in1, float *in2, float *out, int len) {
     if (i < len) {
         out[i] = in1[i] + in2[i];
     }
-    printf("something\n");
 }
 
 __host__ void errchk(cudaError_t error_code, int line) {
@@ -65,7 +64,6 @@ int main(int argc, char **argv) {
   //@@ Launch the GPU Kernel here
   vecAdd <<<DimGrid, DimBlock>>> (deviceInput1, deviceInput2, deviceOutput, inputLength);
   errchk(cudaDeviceSynchronize(), __LINE__);
-  errchk(cudaPeekAtLastError(), __LINE__);
   wbTime_stop(Compute, "Performing CUDA computation");
  
   wbTime_start(Copy, "Copying output memory to the CPU");
