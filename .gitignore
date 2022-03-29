@@ -1,0 +1,9 @@
+*/build/*
+*/datasets/*
+*batch*
+*/source/libwb/*
+*/submission/*
+*CMakeLists.txt
+wc
+*sources.cmake
+A0/source/VectorAdd
