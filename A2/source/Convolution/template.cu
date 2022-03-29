@@ -23,15 +23,15 @@
     }                                                                     \
   } while (0)
 
-//@@ INSERT CODE HERE 
+//@@ INSERT CODE HERE
 //implement the tiled 2D convolution kernel with adjustments for channels
 //use shared memory to reduce the number of global accesses, handle the boundary conditions when loading input list elements into the shared memory
 //clamp your output values
 __global__ void convolution_2D_kernel_tiled (
-	float* in, 
+	float* in,
 	const float* __restrict__ m,
 	float* out,
-	int height, 
+	int height,
 	int width)
 {
 	// if the device does not have enough shared memory, a phased algorithm
@@ -102,9 +102,6 @@ int main(int argc, char *argv[]) {
 
   inputImageFile = wbArg_getInputFile(arg, 0);
   inputMaskFile  = wbArg_getInputFile(arg, 1);
-  // debug
-  char correctImageFile[] = ".\\Convolution\\Dataset\\0\\output.ppm";
-  wbImage_t correctImage = wbImport(correctImageFile);
 
   inputImage   = wbImport(inputImageFile);
   hostMaskData = (float *)wbImport(inputMaskFile, &maskRows, &maskColumns);
@@ -136,9 +133,9 @@ int main(int argc, char *argv[]) {
   //copy host memory to device
   wbCheck(
 	  cudaMemcpy(
-		  deviceInputImageData, 
-		  hostInputImageData, 
-		  imageWidth * imageHeight * imageChannels * sizeof(float), 
+		  deviceInputImageData,
+		  hostInputImageData,
+		  imageWidth * imageHeight * imageChannels * sizeof(float),
 		  cudaMemcpyHostToDevice
 	  )
   );
@@ -150,68 +147,34 @@ int main(int argc, char *argv[]) {
   //initialize thread block and kernel grid dimensions
   dim3 DimGrid((wbImage_getWidth(inputImage) - 1) / O_TILE_WIDTH + 1, (wbImage_getHeight(inputImage) - 1) / O_TILE_WIDTH + 1, 1);
   dim3 DimBlock(BLOCK_WIDTH, BLOCK_WIDTH, 1);
-  //invoke CUDA kernel	
+  //invoke CUDA kernel
   convolution_2D_kernel_tiled <<< DimGrid, DimBlock >>> (
-	  deviceInputImageData, 
-	  deviceMaskData, 
-	  deviceOutputImageData, 
-	  imageHeight, 
+	  deviceInputImageData,
+	  deviceMaskData,
+	  deviceOutputImageData,
+	  imageHeight,
 	  imageWidth
   );
   wbTime_stop(Compute, "Doing the computation on the GPU");
 
   wbTime_start(Copy, "Copying data from the GPU");
   //@@ INSERT CODE HERE
-  //copy results from device to host	
+  //copy results from device to host
   wbCheck(
 	  cudaMemcpy(
-		  hostOutputImageData, 
-		  deviceOutputImageData, 
-		  imageHeight * imageWidth * imageChannels * sizeof(float), 
+		  hostOutputImageData,
+		  deviceOutputImageData,
+		  imageHeight * imageWidth * imageChannels * sizeof(float),
 		  cudaMemcpyDeviceToHost
 	  )
   );
   wbTime_stop(Copy, "Copying data from the GPU");
 
   wbTime_stop(GPU, "Doing GPU Computation (memory + compute)");
-
-  /*
-  FILE* fp = fopen("myoutput.txt", "w");
-  for (int i = 0; i < imageHeight; i++) {
-	  for (int j = 0; j < imageWidth; j++) {
-		  if (j > 0 && !(j % O_TILE_WIDTH)) {
-			  fprintf(fp, "\n");
-		  }
-		  fprintf(fp, " [%d][%d] %.3f %.3f %.3f  ", i, j,
-			  hostOutputImageData[(i * imageWidth + j) * 3], 
-			  hostOutputImageData[(i * imageWidth + j) * 3 + 1],
-			  hostOutputImageData[(i * imageWidth + j) * 3 + 2]
-		  );
-	  }
-	  fprintf(fp, "\n\n");
-  }
-  fclose(fp);
-
-  fp = fopen("output.txt", "w");
-  for (int i = 0; i < imageHeight; i++) {
-	  for (int j = 0; j < imageWidth; j++) {
-		  if (j > 0 && !(j % O_TILE_WIDTH)) {
-			  fprintf(fp, "\n");
-		  }
-		  fprintf(fp, " [%d][%d] %.3f %.3f %.3f  ", i, j,
-			  correctImage->data[(i * imageWidth + j) * 3],
-			  correctImage->data[(i * imageWidth + j) * 3 + 1],
-			  correctImage->data[(i * imageWidth + j) * 3 + 2]
-		  );
-	  }
-	  fprintf(fp, "\n\n");
-  }
-  fclose(fp);
-  */
   wbSolution(arg, outputImage);
 
   //@@ INSERT CODE HERE
-  //deallocate device memory	
+  //deallocate device memory
   wbCheck(cudaFree(deviceInputImageData));
   wbCheck(cudaFree(deviceMaskData));
   wbCheck(cudaFree(deviceOutputImageData));
@@ -219,8 +182,6 @@ int main(int argc, char *argv[]) {
   free(hostMaskData);
   wbImage_delete(outputImage);
   wbImage_delete(inputImage);
-
-  wbImage_delete(correctImage);
 
   return 0;
 }
