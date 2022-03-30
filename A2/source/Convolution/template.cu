@@ -1,7 +1,6 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 #include <wb.h>
-#include <cstdio>
 
 #define MASK_WIDTH		5
 #define O_TILE_WIDTH	16
@@ -27,7 +26,7 @@
 //implement the tiled 2D convolution kernel with adjustments for channels
 //use shared memory to reduce the number of global accesses, handle the boundary conditions when loading input list elements into the shared memory
 //clamp your output values
-__global__ void convolution_2D_kernel_tiled (
+__global__ void convolution_2D_kernel_tiled_v1 (
 	float* in,
 	const float* __restrict__ m,
 	float* out,
@@ -53,7 +52,8 @@ __global__ void convolution_2D_kernel_tiled (
 		ds_in[ty][tx][IN_CHANNELS_R] = in[(row_i * width + col_i) * IN_CHANNELS + IN_CHANNELS_R];
 		ds_in[ty][tx][IN_CHANNELS_G] = in[(row_i * width + col_i) * IN_CHANNELS + IN_CHANNELS_G];
 		ds_in[ty][tx][IN_CHANNELS_B] = in[(row_i * width + col_i) * IN_CHANNELS + IN_CHANNELS_B];
-	} else {
+	}
+	else {
 		ds_in[ty][tx][IN_CHANNELS_R] = 0;
 		ds_in[ty][tx][IN_CHANNELS_G] = 0;
 		ds_in[ty][tx][IN_CHANNELS_B] = 0;
@@ -76,6 +76,54 @@ __global__ void convolution_2D_kernel_tiled (
 			out[(row_o * width + col_o) * IN_CHANNELS + IN_CHANNELS_R] = clamp(tmpR);
 			out[(row_o * width + col_o) * IN_CHANNELS + IN_CHANNELS_G] = clamp(tmpG);
 			out[(row_o * width + col_o) * IN_CHANNELS + IN_CHANNELS_B] = clamp(tmpB);
+		}
+	}
+}
+
+__global__ void convolution_2D_kernel_tiled_v2 (
+	float* in,
+	const float* __restrict__ m,
+	float* out,
+	int height,
+	int width)
+{
+	// if the device does not have enough shared memory, a phased algorithm
+	//   can be elaborated where in each phase one channel is convolved
+	__shared__ float ds_in[BLOCK_WIDTH][BLOCK_WIDTH];
+
+	int tx = threadIdx.x, ty = threadIdx.y;
+	int row_o = blockIdx.y * O_TILE_WIDTH + ty;
+	int col_o = blockIdx.x * O_TILE_WIDTH + tx;
+
+	int row_i = row_o - MASK_WIDTH / 2;
+	int col_i = col_o - MASK_WIDTH / 2;
+
+	int ch = blockIdx.z;
+
+	float tmpP = 0;
+
+	if ((row_i >= 0 && row_i < height) &&
+		(col_i >= 0 && col_i < width))
+	{
+		ds_in[ty][tx] = in[(row_i * width + col_i) * IN_CHANNELS + ch];
+	}
+	else {
+		ds_in[ty][tx] = 0;
+	}
+	__syncthreads();
+
+	if (ty < O_TILE_WIDTH && tx < O_TILE_WIDTH) {
+		for (int i = 0; i < MASK_WIDTH; i++) {
+			for (int j = 0; j < MASK_WIDTH; j++) {
+				tmpP += m[i * MASK_WIDTH + j] * ds_in[ty + i][tx + j];
+			}
+		}
+	}
+	__syncthreads();
+
+	if (ty < O_TILE_WIDTH && tx < O_TILE_WIDTH) {
+		if (row_o < height && col_o < width) {
+			out[(row_o * width + col_o) * IN_CHANNELS + ch] = clamp(tmpP);
 		}
 	}
 }
@@ -145,10 +193,11 @@ int main(int argc, char *argv[]) {
   wbTime_start(Compute, "Doing the computation on the GPU");
   //@@ INSERT CODE HERE
   //initialize thread block and kernel grid dimensions
-  dim3 DimGrid((wbImage_getWidth(inputImage) - 1) / O_TILE_WIDTH + 1, (wbImage_getHeight(inputImage) - 1) / O_TILE_WIDTH + 1, 1);
+  //dim3 DimGrid((wbImage_getWidth(inputImage) - 1) / O_TILE_WIDTH + 1, (wbImage_getHeight(inputImage) - 1) / O_TILE_WIDTH + 1, 1);
+  dim3 DimGrid((wbImage_getWidth(inputImage) - 1) / O_TILE_WIDTH + 1, (wbImage_getHeight(inputImage) - 1) / O_TILE_WIDTH + 1, IN_CHANNELS);
   dim3 DimBlock(BLOCK_WIDTH, BLOCK_WIDTH, 1);
   //invoke CUDA kernel
-  convolution_2D_kernel_tiled <<< DimGrid, DimBlock >>> (
+  convolution_2D_kernel_tiled_v2 <<< DimGrid, DimBlock >>> (
 	  deviceInputImageData,
 	  deviceMaskData,
 	  deviceOutputImageData,
@@ -171,6 +220,41 @@ int main(int argc, char *argv[]) {
   wbTime_stop(Copy, "Copying data from the GPU");
 
   wbTime_stop(GPU, "Doing GPU Computation (memory + compute)");
+
+
+  FILE* fp = fopen("myoutput.txt", "w");
+  for (int i = 0; i < imageHeight; i++) {
+	  for (int j = 0; j < imageWidth; j++) {
+		  if (j > 0 && !(j % O_TILE_WIDTH)) {
+			  fprintf(fp, "\n");
+		  }
+		  fprintf(fp, " [%d][%d] %.3f %.3f %.3f  ", i, j,
+			  hostOutputImageData[(i * imageWidth + j) * 3],
+			  hostOutputImageData[(i * imageWidth + j) * 3 + 1],
+			  hostOutputImageData[(i * imageWidth + j) * 3 + 2]
+		  );
+	  }
+	  fprintf(fp, "\n\n");
+  }
+  fclose(fp);
+  /*
+  fp = fopen("output.txt", "w");
+  for (int i = 0; i < imageHeight; i++) {
+	  for (int j = 0; j < imageWidth; j++) {
+		  if (j > 0 && !(j % O_TILE_WIDTH)) {
+			  fprintf(fp, "\n");
+		  }
+		  fprintf(fp, " [%d][%d] %.3f %.3f %.3f  ", i, j,
+			  correctImage->data[(i * imageWidth + j) * 3],
+			  correctImage->data[(i * imageWidth + j) * 3 + 1],
+			  correctImage->data[(i * imageWidth + j) * 3 + 2]
+		  );
+	  }
+	  fprintf(fp, "\n\n");
+  }
+  fclose(fp);
+  */
+
   wbSolution(arg, outputImage);
 
   //@@ INSERT CODE HERE
