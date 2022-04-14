@@ -10,6 +10,10 @@
 #define IN_CHANNELS_G	1
 #define IN_CHANNELS_B	2
 
+#define GRID_DIM_2D		0
+#define GRID_DIM_3D		1
+#define GRID_DIM		  GRID_DIM_3D
+
 #define clamp(x) (min(max((x), 0.0), 1.0))
 
 #define wbCheck(stmt)                                                     \
@@ -26,6 +30,7 @@
 //implement the tiled 2D convolution kernel with adjustments for channels
 //use shared memory to reduce the number of global accesses, handle the boundary conditions when loading input list elements into the shared memory
 //clamp your output values
+#if GRID_DIM == GRID_DIM_2D
 __global__ void convolution_2D_kernel_tiled_v1 (
 	float* in,
 	const float* __restrict__ m,
@@ -79,7 +84,9 @@ __global__ void convolution_2D_kernel_tiled_v1 (
 		}
 	}
 }
+#endif
 
+#if GRID_DIM == GRID_DIM_3D
 __global__ void convolution_2D_kernel_tiled_v2 (
 	float* in,
 	const float* __restrict__ m,
@@ -127,6 +134,7 @@ __global__ void convolution_2D_kernel_tiled_v2 (
 		}
 	}
 }
+#endif
 
 int main(int argc, char *argv[]) {
   wbArg_t arg;
@@ -193,9 +201,21 @@ int main(int argc, char *argv[]) {
   wbTime_start(Compute, "Doing the computation on the GPU");
   //@@ INSERT CODE HERE
   //initialize thread block and kernel grid dimensions
-  //dim3 DimGrid((wbImage_getWidth(inputImage) - 1) / O_TILE_WIDTH + 1, (wbImage_getHeight(inputImage) - 1) / O_TILE_WIDTH + 1, 1);
-  dim3 DimGrid((wbImage_getWidth(inputImage) - 1) / O_TILE_WIDTH + 1, (wbImage_getHeight(inputImage) - 1) / O_TILE_WIDTH + 1, IN_CHANNELS);
+  // block dimensions are always the same
   dim3 DimBlock(BLOCK_WIDTH, BLOCK_WIDTH, 1);
+#if GRID_DIM == GRID_DIM_2D
+  dim3 DimGrid((wbImage_getWidth(inputImage) - 1) / O_TILE_WIDTH + 1, (wbImage_getHeight(inputImage) - 1) / O_TILE_WIDTH + 1, 1);
+  //invoke CUDA kernel
+  convolution_2D_kernel_tiled_v1 <<< DimGrid, DimBlock >>> (
+	  deviceInputImageData,
+	  deviceMaskData,
+	  deviceOutputImageData,
+	  imageHeight,
+	  imageWidth
+	  );
+#endif
+#if GRID_DIM == GRID_DIM_3D
+  dim3 DimGrid((wbImage_getWidth(inputImage) - 1) / O_TILE_WIDTH + 1, (wbImage_getHeight(inputImage) - 1) / O_TILE_WIDTH + 1, IN_CHANNELS);
   //invoke CUDA kernel
   convolution_2D_kernel_tiled_v2 <<< DimGrid, DimBlock >>> (
 	  deviceInputImageData,
@@ -203,7 +223,8 @@ int main(int argc, char *argv[]) {
 	  deviceOutputImageData,
 	  imageHeight,
 	  imageWidth
-  );
+	  );
+#endif
   wbTime_stop(Compute, "Doing the computation on the GPU");
 
   wbTime_start(Copy, "Copying data from the GPU");
@@ -220,40 +241,6 @@ int main(int argc, char *argv[]) {
   wbTime_stop(Copy, "Copying data from the GPU");
 
   wbTime_stop(GPU, "Doing GPU Computation (memory + compute)");
-
-
-  FILE* fp = fopen("myoutput.txt", "w");
-  for (int i = 0; i < imageHeight; i++) {
-	  for (int j = 0; j < imageWidth; j++) {
-		  if (j > 0 && !(j % O_TILE_WIDTH)) {
-			  fprintf(fp, "\n");
-		  }
-		  fprintf(fp, " [%d][%d] %.3f %.3f %.3f  ", i, j,
-			  hostOutputImageData[(i * imageWidth + j) * 3],
-			  hostOutputImageData[(i * imageWidth + j) * 3 + 1],
-			  hostOutputImageData[(i * imageWidth + j) * 3 + 2]
-		  );
-	  }
-	  fprintf(fp, "\n\n");
-  }
-  fclose(fp);
-  /*
-  fp = fopen("output.txt", "w");
-  for (int i = 0; i < imageHeight; i++) {
-	  for (int j = 0; j < imageWidth; j++) {
-		  if (j > 0 && !(j % O_TILE_WIDTH)) {
-			  fprintf(fp, "\n");
-		  }
-		  fprintf(fp, " [%d][%d] %.3f %.3f %.3f  ", i, j,
-			  correctImage->data[(i * imageWidth + j) * 3],
-			  correctImage->data[(i * imageWidth + j) * 3 + 1],
-			  correctImage->data[(i * imageWidth + j) * 3 + 2]
-		  );
-	  }
-	  fprintf(fp, "\n\n");
-  }
-  fclose(fp);
-  */
 
   wbSolution(arg, outputImage);
 
