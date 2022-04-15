@@ -14,25 +14,8 @@
     }                                                                     \
   } while (0)
 
-__host__ __device__ unsigned nblocks_scan(unsigned len) {
+__host__ unsigned nblocks_scan(unsigned len) {
     return ((len - 1)/(2 * BLOCK_SIZE) + 1);
-}
-
-__host__ __device__ void debug(float* arr, unsigned len) {
-    printf("debugging array of length %d\n", len);
-    for (int i = min(len - 1, 2 * BLOCK_SIZE - 1); i < len; i += 2 * BLOCK_SIZE) {
-        printf("arr[%d] = %.2f\n", i, arr[i]);
-    }
-    if (len % (2 * BLOCK_SIZE)) {
-        printf("arr[%d] = %.2f\n", len - 1, arr[len - 1]);
-    }
-}
-
-__host__ __device__ void print_array(float* arr, int arr_len) {
-    printf("printing array of length %d\n", arr_len);
-    for (int i = arr_len; i > 0; i--) {
-        printf("arr[%d] = %.2f\n", arr_len - i, arr[arr_len - i]);
-    }
 }
 
 __global__ void scan (float *input, float *output, float *aux, int len) {
@@ -73,7 +56,7 @@ __global__ void scan (float *input, float *output, float *aux, int len) {
             XY[index + stride] += XY[index];
         }
     }
-    // finish all the computations
+    // finish all the computations. Do we really need it?
     __syncthreads();
     // store outputs
     if (i < len) {
@@ -91,46 +74,16 @@ __global__ void scan (float *input, float *output, float *aux, int len) {
             aux[blockIdx.x] = XY[2*blockDim.x - 1];
         }
     }
-
-    __syncthreads();
-    if (i == len-1) {
-        printf("\nPrinting from scan() aux is %s\n", aux != NULL? "not NULL" : "NULL");
-        if (aux) {
-            printf("1st launch\n");
-            printf("output array\n");
-            debug(output, len);
-            printf("aux array\n");
-            print_array(aux, nblocks_scan(len));
-        } else {
-            printf("2nd launch\n");
-            printf("output array\n");
-            print_array(output, len);
-        }
-    }
 }
 
 __global__ void addScannedBlockSums(float *output, float *aux, int len) {
 	//@@ Modify the body of this kernel to add scanned block sums to
 	//@@ all values of the scanned blocks
     int i = (blockIdx.x+1)*blockDim.x + threadIdx.x;
-    //printf("addScannedBlockSums len = %d and i = %d\n", len, i);
+
     if (i < len) {
-        //if ((!(i % 2*BLOCK_SIZE) && i < len) || ((i % 2*BLOCK_SIZE) && i == len)) {
-        //    printf("output[%d]=%.2f += aux[%d]=%.2f => output[%d]=%.2f\n", i, output[i], blockIdx.x, aux[blockIdx.x], i, output[i] + aux[blockIdx.x]);
-        //}
         output[i] += aux[blockIdx.x];
     }
-
-    /*
-    __syncthreads();
-    if (i == len) {
-        printf("\nPrinting from addScannedBlockSums()\n");
-        printf("output array\n");
-        debug(output, len);
-        printf("aux array\n");
-        print_array(aux, (len-1)/BLOCK_SIZE+1);
-    }
-    */
 }
 
 int main(int argc, char **argv) {
@@ -152,13 +105,14 @@ int main(int argc, char **argv) {
   wbLog(TRACE, "The number of input elements in the input is ",
         numElements);
 
-  debug(hostInput, numElements);
-
   wbTime_start(GPU, "Allocating device memory.");
   //@@ Allocate device memory
   wbCheck(cudaMalloc((void **)&deviceInput, numElements * sizeof(float)));
   wbCheck(cudaMalloc((void **)&deviceOutput, numElements * sizeof(float)));
   //you can assume that aux array size would not need to be more than BLOCK_SIZE*2 (i.e., 1024)
+  // In fact, aux arrays' length will be equal to the number of blocks.
+  // I will keep the assumption that the number of blocks will be less than 2*BLOCK_SIZE,
+  //   but will try to always optimize available resources.
   wbCheck(cudaMalloc((void **)&deviceAuxArray, nblocks_scan(numElements) * sizeof(float)));
   wbCheck(cudaMalloc((void **)&deviceAuxScannedArray, nblocks_scan(numElements) * sizeof(float)));
   wbTime_stop(GPU, "Allocating device memory.");
@@ -174,7 +128,7 @@ int main(int argc, char **argv) {
   wbTime_stop(GPU, "Copying input host memory to device.");
 
   //@@ Initialize the grid and block dimensions here
-
+  // First scan launch
   dim3 DimGrid(nblocks_scan(numElements), 1, 1);
   dim3 DimBlock(BLOCK_SIZE, 1, 1);
 
@@ -187,23 +141,20 @@ int main(int argc, char **argv) {
   //@@ (hint: pass NULL to the aux parameter)
   //@@ Then you should call addScannedBlockSums kernel.
   //invoke CUDA kernel
-  printf("launching scan 1st time\n");
   scan <<< DimGrid, DimBlock >>> (
 	  deviceInput,
 	  deviceOutput,
       deviceAuxArray,
 	  numElements
   );
-
-  // reduce the number of threads to be launched
-  // "you can assume that aux array size would not need to be more than BLOCK_SIZE*2 (i.e., 1024)"
-  // that implies we'll need to launch only one block, but let's be generic
-  // dim3 DimGrid(nblocks_scan(nblocks_scan(numElements)), 1, 1);
   cudaDeviceSynchronize();
+  // According to our assumption, the number of blocks for the first scan launch
+  //   is less or equal than 2*BLOCK_SIZE, then, for the second launch, we set
+  //   a new grid with only one block sized equal to the number of blocks
+  //   of the first launch.
   dim3 DimGridAux(1, 1, 1);
   dim3 DimBlockAux(nblocks_scan(numElements)/2, 1, 1);
 
-  printf("launching scan 2nd time\n");
   scan <<< DimGridAux, DimBlockAux >>> (
       deviceAuxArray,
 	  deviceAuxScannedArray,
@@ -212,10 +163,12 @@ int main(int argc, char **argv) {
   );
   cudaDeviceSynchronize();
 
+  // For the last launch, we will have one less block compared to the first launch.
+  //   The block size must be 2*BLOCK_SIZE because it was the number of elements
+  //   processed by the scan.
   dim3 DimGridAuxSum(nblocks_scan(numElements)-1, 1, 1);
   dim3 DimBlockAuxSum(2*BLOCK_SIZE, 1, 1);
 
-  printf("launching last scan sum\n");
   addScannedBlockSums <<< DimGridAuxSum, DimBlockAuxSum >>> (
 	  deviceOutput,
 	  deviceAuxScannedArray,
