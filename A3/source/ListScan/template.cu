@@ -65,7 +65,8 @@ __global__ void scan(float *input, float *output, float *aux, int len) {
     if (aux) {
         if (i == len - 1) {
             aux[blockIdx.x] = XY[threadIdx.x];
-        } else // if (threadIdx.x == BLOCK_SIZE - 1) { // what is faster BLOCK_SIZE comparisons + 1 store or BLOCK_SIZE stores?
+        } else // if (threadIdx.x == 2*BLOCK_SIZE - 1) {
+            // what is faster BLOCK_SIZE comparisons + 1 store or BLOCK_SIZE stores?
             aux[blockIdx.x] = XY[2*BLOCK_SIZE - 1];
         }
     }
@@ -74,10 +75,14 @@ __global__ void scan(float *input, float *output, float *aux, int len) {
 __global__ void addScannedBlockSums(float *output, float *aux, int len) {
 	//@@ Modify the body of this kernel to add scanned block sums to
 	//@@ all values of the scanned blocks
+    int i = blockIdx.x*blockDim.x + threadIdx.x;
 
+    if (blockIdx.x > 0 && i < len) {
+        output[i] += aux[blockIdx.x - 1];
+    }
 }
 
-__host__ unsigned blocks_needed (unsigned len) {
+__host__ unsigned nblocks_scan (unsigned len) {
     return ((len - 1) / 2*BLOCK_SIZE + 1);
 }
 
@@ -106,8 +111,8 @@ int main(int argc, char **argv) {
   wbCheck(cudaMalloc((void **)&deviceOutput, numElements * sizeof(float)));
   wbCheck(cudaMalloc((void **)&deviceOutput, numElements * sizeof(float)));
   //you can assume that aux array size would not need to be more than BLOCK_SIZE*2 (i.e., 1024)
-  wbCheck(cudaMalloc((void **)&deviceAuxArray, 2 * BLOCK_SIZE * sizeof(float)));
-  wbCheck(cudaMalloc((void **)&deviceAuxScanArray, 2 * BLOCK_SIZE * sizeof(float)));
+  wbCheck(cudaMalloc((void **)&deviceAuxArray, nblocks_scan(numElements) * sizeof(float)));
+  wbCheck(cudaMalloc((void **)&deviceAuxScanArray, nblocks_scan(numElements) * sizeof(float)));
   wbTime_stop(GPU, "Allocating device memory.");
 
   wbTime_start(GPU, "Clearing output device memory.");
@@ -122,7 +127,7 @@ int main(int argc, char **argv) {
 
   //@@ Initialize the grid and block dimensions here
 
-  dim3 DimGrid(blocks_needed(numElements), 1, 1);
+  dim3 DimGrid(nblocks_scan(numElements), 1, 1);
   dim3 DimBlock(BLOCK_SIZE, 1, 1);
 
   wbTime_start(Compute, "Performing CUDA computation");
@@ -144,19 +149,22 @@ int main(int argc, char **argv) {
   // reduce the number of threads to be launched
   // "you can assume that aux array size would not need to be more than BLOCK_SIZE*2 (i.e., 1024)"
   // that implies we'll need to launch only one block, but let's be generic
-  dim3 DimGrid(blocks_needed(blocks_needed(numElements)), 1, 1);
+  // dim3 DimGrid(nblocks_scan(nblocks_scan(numElements)), 1, 1);
+  dim3 DimBlock(1, 1, 1);
 
   scan <<< DimGrid, DimBlock >>> (
 	  deviceAuxArray,
 	  deviceAuxScanArray,
     NULL,
-	  blocks_needed(numElements)
+	  nblocks_scan(numElements)
   );
   cudaDeviceSynchronize();
+
+  dim3 DimBlock(2*BLOCK_SIZE, 1, 1);
   addScannedBlockSums <<< DimGrid, DimBlock >>> (
 	  deviceOutput,
 	  deviceAuxScanArray,
-	  blocks_needed(numElements)
+	  numElements
   );
   wbTime_stop(Compute, "Performing CUDA computation");
 
