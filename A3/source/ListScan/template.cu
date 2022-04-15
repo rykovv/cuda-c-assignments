@@ -14,7 +14,28 @@
     }                                                                     \
   } while (0)
 
-__global__ void scan(float *input, float *output, float *aux, int len) {
+__host__ __device__ unsigned nblocks_scan(unsigned len) {
+    return ((len - 1)/(2 * BLOCK_SIZE) + 1);
+}
+
+__host__ __device__ void debug(float* arr, unsigned len) {
+    printf("debugging array of length %d\n", len);
+    for (int i = min(len - 1, 2 * BLOCK_SIZE - 1); i < len; i += 2 * BLOCK_SIZE) {
+        printf("arr[%d] = %.2f\n", i, arr[i]);
+    }
+    if (len % (2 * BLOCK_SIZE)) {
+        printf("arr[%d] = %.2f\n", len - 1, arr[len - 1]);
+    }
+}
+
+__host__ __device__ void print_array(float* arr, int arr_len) {
+    printf("printing array of length %d\n", arr_len);
+    for (int i = arr_len; i > 0; i--) {
+        printf("arr[%d] = %.2f\n", arr_len - i, arr[arr_len - i]);
+    }
+}
+
+__global__ void scan (float *input, float *output, float *aux, int len) {
     //@@ Modify the body of this kernel to generate the scanned blocks
     //@@ Make sure to use the workefficient version of the parallel scan
     //@@ Also make sure to store the block sum to the aux array
@@ -65,9 +86,23 @@ __global__ void scan(float *input, float *output, float *aux, int len) {
     if (aux) {
         if (i == len - 1) {
             aux[blockIdx.x] = XY[threadIdx.x];
-        } else // if (threadIdx.x == 2*BLOCK_SIZE - 1) {
+        } else if (threadIdx.x == BLOCK_SIZE - 1) {
             // what is faster BLOCK_SIZE comparisons + 1 store or BLOCK_SIZE stores?
             aux[blockIdx.x] = XY[2*BLOCK_SIZE - 1];
+        }
+    }
+
+    __syncthreads();
+    if (i == len) {
+        printf("\nPrinting from scan() aux %s\n", aux != NULL? "is not NULL" : "is NULL");
+        if (aux) {
+            printf("output array\n");
+            debug(output, len);
+            printf("aux array\n");
+            print_array(aux, nblocks_scan(len));
+        } else {
+            printf("output array\n");
+            print_array(output, len);
         }
     }
 }
@@ -75,15 +110,25 @@ __global__ void scan(float *input, float *output, float *aux, int len) {
 __global__ void addScannedBlockSums(float *output, float *aux, int len) {
 	//@@ Modify the body of this kernel to add scanned block sums to
 	//@@ all values of the scanned blocks
-    int i = blockIdx.x*blockDim.x + threadIdx.x;
-
-    if (blockIdx.x > 0 && i < len) {
-        output[i] += aux[blockIdx.x - 1];
+    int i = (blockIdx.x+1)*blockDim.x + threadIdx.x;
+    //printf("addScannedBlockSums len = %d and i = %d\n", len, i);
+    if (i < len) {
+        //if ((!(i % 2*BLOCK_SIZE) && i < len) || ((i % 2*BLOCK_SIZE) && i == len)) {
+        //    printf("output[%d]=%.2f += aux[%d]=%.2f => output[%d]=%.2f\n", i, output[i], blockIdx.x, aux[blockIdx.x], i, output[i] + aux[blockIdx.x]);
+        //}
+        output[i] += aux[blockIdx.x];
     }
-}
 
-__host__ unsigned nblocks_scan (unsigned len) {
-    return ((len - 1) / 2*BLOCK_SIZE + 1);
+    /*
+    __syncthreads();
+    if (i == len) {
+        printf("\nPrinting from addScannedBlockSums()\n");
+        printf("output array\n");
+        debug(output, len);
+        printf("aux array\n");
+        print_array(aux, (len-1)/BLOCK_SIZE+1);
+    }
+    */
 }
 
 int main(int argc, char **argv) {
@@ -105,14 +150,15 @@ int main(int argc, char **argv) {
   wbLog(TRACE, "The number of input elements in the input is ",
         numElements);
 
+  debug(hostInput, numElements);
+
   wbTime_start(GPU, "Allocating device memory.");
   //@@ Allocate device memory
   wbCheck(cudaMalloc((void **)&deviceInput, numElements * sizeof(float)));
   wbCheck(cudaMalloc((void **)&deviceOutput, numElements * sizeof(float)));
-  wbCheck(cudaMalloc((void **)&deviceOutput, numElements * sizeof(float)));
   //you can assume that aux array size would not need to be more than BLOCK_SIZE*2 (i.e., 1024)
   wbCheck(cudaMalloc((void **)&deviceAuxArray, nblocks_scan(numElements) * sizeof(float)));
-  wbCheck(cudaMalloc((void **)&deviceAuxScanArray, nblocks_scan(numElements) * sizeof(float)));
+  wbCheck(cudaMalloc((void **)&deviceAuxScannedArray, nblocks_scan(numElements) * sizeof(float)));
   wbTime_stop(GPU, "Allocating device memory.");
 
   wbTime_start(GPU, "Clearing output device memory.");
@@ -139,6 +185,7 @@ int main(int argc, char **argv) {
   //@@ (hint: pass NULL to the aux parameter)
   //@@ Then you should call addScannedBlockSums kernel.
   //invoke CUDA kernel
+  printf("launching scan 1st time\n");
   scan <<< DimGrid, DimBlock >>> (
 	  deviceInput,
 	  deviceOutput,
@@ -150,20 +197,24 @@ int main(int argc, char **argv) {
   // "you can assume that aux array size would not need to be more than BLOCK_SIZE*2 (i.e., 1024)"
   // that implies we'll need to launch only one block, but let's be generic
   // dim3 DimGrid(nblocks_scan(nblocks_scan(numElements)), 1, 1);
-  dim3 DimBlock(1, 1, 1);
+  dim3 DimBlockAux(1, 1, 1);
 
-  scan <<< DimGrid, DimBlock >>> (
+  printf("launching scan 2nd time\n");
+  scan <<< DimGrid, DimBlockAux >>> (
 	  deviceAuxArray,
-	  deviceAuxScanArray,
-    NULL,
+	  deviceAuxScannedArray,
+      NULL,
 	  nblocks_scan(numElements)
   );
   cudaDeviceSynchronize();
 
-  dim3 DimBlock(2*BLOCK_SIZE, 1, 1);
-  addScannedBlockSums <<< DimGrid, DimBlock >>> (
+  dim3 DimGridAuxSum(nblocks_scan(numElements)-1, 1, 1);
+  dim3 DimBlockAuxSum(2*BLOCK_SIZE, 1, 1);
+
+  printf("launching last scan sum\n");
+  addScannedBlockSums <<< DimGridAuxSum, DimBlockAuxSum >>> (
 	  deviceOutput,
-	  deviceAuxScanArray,
+	  deviceAuxScannedArray,
 	  numElements
   );
   wbTime_stop(Compute, "Performing CUDA computation");
@@ -178,7 +229,7 @@ int main(int argc, char **argv) {
   wbCheck(cudaFree(deviceInput));
   wbCheck(cudaFree(deviceOutput));
   wbCheck(cudaFree(deviceAuxArray));
-  wbCheck(cudaFree(deviceAuxScanArray));
+  wbCheck(cudaFree(deviceAuxScannedArray));
   wbTime_stop(GPU, "Freeing device memory");
 
   wbSolution(args, hostOutput, numElements);
