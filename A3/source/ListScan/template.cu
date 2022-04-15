@@ -58,18 +58,18 @@ __global__ void scan (float *input, float *output, float *aux, int len) {
         __syncthreads();
         // legacy indexing
         int index = (threadIdx.x + 1)*stride*2 - 1;
-        if (index < 2*BLOCK_SIZE) {
+        if (index < 2*blockDim.x) {
             XY[index] += XY[index - stride];
         }
     }
 
     // Post reduction reverse phase
-    for (unsigned stride = BLOCK_SIZE/2; stride > 0; stride /= 2) {
+    for (unsigned stride = blockDim.x/2; stride > 0; stride /= 2) {
         // once previous computations are done
         __syncthreads();
         // legacy index
         int index = (threadIdx.x + 1)*stride*2 - 1;
-        if (index + stride < 2*BLOCK_SIZE) {
+        if (index + stride < 2*blockDim.x) {
             XY[index + stride] += XY[index];
         }
     }
@@ -86,21 +86,23 @@ __global__ void scan (float *input, float *output, float *aux, int len) {
     if (aux) {
         if (i == len - 1) {
             aux[blockIdx.x] = XY[threadIdx.x];
-        } else if (threadIdx.x == BLOCK_SIZE - 1) {
+        } else if (threadIdx.x == blockDim.x - 1) {
             // what is faster BLOCK_SIZE comparisons + 1 store or BLOCK_SIZE stores?
-            aux[blockIdx.x] = XY[2*BLOCK_SIZE - 1];
+            aux[blockIdx.x] = XY[2*blockDim.x - 1];
         }
     }
 
     __syncthreads();
-    if (i == len) {
-        printf("\nPrinting from scan() aux %s\n", aux != NULL? "is not NULL" : "is NULL");
+    if (i == len-1) {
+        printf("\nPrinting from scan() aux is %s\n", aux != NULL? "not NULL" : "NULL");
         if (aux) {
+            printf("1st launch\n");
             printf("output array\n");
             debug(output, len);
             printf("aux array\n");
             print_array(aux, nblocks_scan(len));
         } else {
+            printf("2nd launch\n");
             printf("output array\n");
             print_array(output, len);
         }
@@ -189,7 +191,7 @@ int main(int argc, char **argv) {
   scan <<< DimGrid, DimBlock >>> (
 	  deviceInput,
 	  deviceOutput,
-	  deviceAuxArray,
+      deviceAuxArray,
 	  numElements
   );
 
@@ -197,11 +199,13 @@ int main(int argc, char **argv) {
   // "you can assume that aux array size would not need to be more than BLOCK_SIZE*2 (i.e., 1024)"
   // that implies we'll need to launch only one block, but let's be generic
   // dim3 DimGrid(nblocks_scan(nblocks_scan(numElements)), 1, 1);
-  dim3 DimBlockAux(1, 1, 1);
+  cudaDeviceSynchronize();
+  dim3 DimGridAux(1, 1, 1);
+  dim3 DimBlockAux(nblocks_scan(numElements)/2, 1, 1);
 
   printf("launching scan 2nd time\n");
-  scan <<< DimGrid, DimBlockAux >>> (
-	  deviceAuxArray,
+  scan <<< DimGridAux, DimBlockAux >>> (
+      deviceAuxArray,
 	  deviceAuxScannedArray,
       NULL,
 	  nblocks_scan(numElements)
