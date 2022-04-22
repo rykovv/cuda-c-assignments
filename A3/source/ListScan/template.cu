@@ -76,7 +76,7 @@ __global__ void scan (float *input, float *output, float *aux, int len) {
     }
 }
 
-__global__ void addScannedBlockSums(float *output, float *aux, int len) {
+__global__ void addScannedBlockSums(float *output, const float* __restrict__ aux, int len) {
 	//@@ Modify the body of this kernel to add scanned block sums to
 	//@@ all values of the scanned blocks
     int i = (blockIdx.x+1)*blockDim.x + threadIdx.x;
