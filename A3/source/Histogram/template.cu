@@ -2,8 +2,9 @@
 #include <device_launch_parameters.h>
 #include <wb.h>
 
-#define NUM_BINS 4096
-#define BLOCK_SIZE 512
+#define NUM_BINS    4096
+#define BLOCK_SIZE  512
+#define SAT_MAX     127
 
 #define CUDA_CHECK(ans)                                                   \
   { gpuAssert((ans), __FILE__, __LINE__); }
@@ -25,11 +26,36 @@ __global__ void histogram(unsigned int *input, unsigned int *bins,
 	//(hint: since NUM_BINS=4096 is larger than maximum allowed number of threads per block,
 	//be aware that threads would need to initialize more than one shared memory bin
 	//and update more than one global memory bin)
-  
+    __shared__ unsigned int private_bins[NUM_BINS];
+
+    if (threadIdx.x < NUM_BINS) {
+        private_bins[threadIdx.x] = 0;
+    }
+    __syncthreads();
+
+    unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;
+    unsigned int stride = blockDim.x * DimGrid.x;
+    unsigned int nbin = 0;
+
+    while (i < num_elements) {
+        nbin = input[i] / ((num_elements - 1)/num_bins + 1);
+        atomicAdd(&(private_bins[nbin]), 1);
+        i += stride;
+    }
+    __syncthreads();
+
+    if (threadIdx.x < NUM_BINS) {
+        atomicAdd(&(output[threadIdx.x]), private_bins[threadIdx.x]);
+    }
 }
 
 __global__ void saturate(unsigned int *bins, unsigned int num_bins) {
 	//@@ Write the kernel that applies saturtion to counters (i.e., if the bin value is more than 127, make it equal to 127)
+    unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;
+
+    if (i < num_bins) {
+        bins[i] = min(bins[i], SAT_MAX);
+    }
 }
 
 int main(int argc, char *argv[]) {
