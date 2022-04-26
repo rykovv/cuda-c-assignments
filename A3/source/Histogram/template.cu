@@ -26,26 +26,29 @@ __global__ void histogram(unsigned int* input, unsigned int* bins,
     //(hint: since NUM_BINS=4096 is larger than maximum allowed number of threads per block,
     //be aware that threads would need to initialize more than one shared memory bin
     //and update more than one global memory bin)
+    // __shared__ unsigned int private_bins[(NUM_BINS - 1)/BLOCK_SIZE + 1][BLOCK_SIZE];
     __shared__ unsigned int private_bins[NUM_BINS];
 
     if (threadIdx.x < NUM_BINS) {
-        private_bins[threadIdx.x] = 0;
+        for (int i = 0; i < NUM_BINS; i += BLOCK_SIZE) {
+            private_bins[threadIdx.x + i] = 0;
+        }
     }
     __syncthreads();
 
     unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;
     unsigned int stride = blockDim.x * gridDim.x;
-    unsigned int nbin = 0;
 
     while (i < num_elements) {
-        nbin = input[i] / ((num_elements - 1) / num_bins + 1);
-        atomicAdd(&(private_bins[nbin]), 1);
+        atomicAdd(&(private_bins[input[i]]), 1);
         i += stride;
     }
     __syncthreads();
 
     if (threadIdx.x < NUM_BINS) {
-        atomicAdd(&(bins[threadIdx.x]), private_bins[threadIdx.x]);
+        for (int i = 0; i < NUM_BINS; i += BLOCK_SIZE) {
+            atomicAdd(&(bins[threadIdx.x + i]), private_bins[threadIdx.x + i]);
+        }
     }
 }
 
