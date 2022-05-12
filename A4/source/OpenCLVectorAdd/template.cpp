@@ -16,6 +16,8 @@
     }                                                                     \
   } while (0)
 
+const char* get_error_string(cl_int err);
+
 //@@ Write the OpenCL kernel
 const char *kernelSource =	"__kernel void vadd (__global const float *a, __global const float *b, __global float *result) {\n"
 								                "int id = get_global_id(0);\n"
@@ -65,7 +67,8 @@ int main(int argc, char *argv[]) {
   wbLog(TRACE, "The input size is ", inputLengthBytes, " bytes");
 
   //@@ Initialize the workgroup dimensions
-  int n_work_groups = (inputLength - 1) / WORK_GROUP_SIZE + 1;
+  size_t global_group_size = inputLength;
+  size_t work_group_size = WORK_GROUP_SIZE/2;
   //@@ Bind to platform
   wbCheck(clGetPlatformIDs(1, &cpPlatform, NULL));
   //@@ Get ID for the device
@@ -96,7 +99,7 @@ int main(int argc, char *argv[]) {
   wbCheck(clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&deviceOutput));
   //@@ Execute the kernel over the entire range of the data set
   cl_event event = NULL;
-  wbCheck(clEnqueueNDRangeKernel(queue, kernel, 1, NULL, n_work_groups, WORK_GROUP_SIZE, 0, NULL, &event));
+  wbCheck(clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &global_group_size, &work_group_size, 0, NULL, &event));
   //@@ Wait for the command queue to get serviced before reading back results
   wbCheck(clWaitForEvents(1, &event));
   //@@ Read the results from the device
@@ -119,4 +122,58 @@ int main(int argc, char *argv[]) {
   free(hostOutput);
 
   return 0;
+}
+
+const char* get_error_string(cl_int err) {
+    switch (err) {
+    case 0: return "CL_SUCCESS";
+    case -1: return "CL_DEVICE_NOT_FOUND";
+    case -2: return "CL_DEVICE_NOT_AVAILABLE";
+    case -3: return "CL_COMPILER_NOT_AVAILABLE";
+    case -4: return "CL_MEM_OBJECT_ALLOCATION_FAILURE";
+    case -5: return "CL_OUT_OF_RESOURCES";
+    case -6: return "CL_OUT_OF_HOST_MEMORY";
+    case -7: return "CL_PROFILING_INFO_NOT_AVAILABLE";
+    case -8: return "CL_MEM_COPY_OVERLAP";
+    case -9: return "CL_IMAGE_FORMAT_MISMATCH";
+    case -10: return "CL_IMAGE_FORMAT_NOT_SUPPORTED";
+    case -11: return "CL_BUILD_PROGRAM_FAILURE";
+    case -12: return "CL_MAP_FAILURE";
+
+    case -30: return "CL_INVALID_VALUE";
+    case -31: return "CL_INVALID_DEVICE_TYPE";
+    case -32: return "CL_INVALID_PLATFORM";
+    case -33: return "CL_INVALID_DEVICE";
+    case -34: return "CL_INVALID_CONTEXT";
+    case -35: return "CL_INVALID_QUEUE_PROPERTIES";
+    case -36: return "CL_INVALID_COMMAND_QUEUE";
+    case -37: return "CL_INVALID_HOST_PTR";
+    case -38: return "CL_INVALID_MEM_OBJECT";
+    case -39: return "CL_INVALID_IMAGE_FORMAT_DESCRIPTOR";
+    case -40: return "CL_INVALID_IMAGE_SIZE";
+    case -41: return "CL_INVALID_SAMPLER";
+    case -42: return "CL_INVALID_BINARY";
+    case -43: return "CL_INVALID_BUILD_OPTIONS";
+    case -44: return "CL_INVALID_PROGRAM";
+    case -45: return "CL_INVALID_PROGRAM_EXECUTABLE";
+    case -46: return "CL_INVALID_KERNEL_NAME";
+    case -47: return "CL_INVALID_KERNEL_DEFINITION";
+    case -48: return "CL_INVALID_KERNEL";
+    case -49: return "CL_INVALID_ARG_INDEX";
+    case -50: return "CL_INVALID_ARG_VALUE";
+    case -51: return "CL_INVALID_ARG_SIZE";
+    case -52: return "CL_INVALID_KERNEL_ARGS";
+    case -53: return "CL_INVALID_WORK_DIMENSION";
+    case -54: return "CL_INVALID_WORK_GROUP_SIZE";
+    case -55: return "CL_INVALID_WORK_ITEM_SIZE";
+    case -56: return "CL_INVALID_GLOBAL_OFFSET";
+    case -57: return "CL_INVALID_EVENT_WAIT_LIST";
+    case -58: return "CL_INVALID_EVENT";
+    case -59: return "CL_INVALID_OPERATION";
+    case -60: return "CL_INVALID_GL_OBJECT";
+    case -61: return "CL_INVALID_BUFFER_SIZE";
+    case -62: return "CL_INVALID_MIP_LEVEL";
+    case -63: return "CL_INVALID_GLOBAL_WORK_SIZE";
+    default: return "Unknown OpenCL error";
+    }
 }
